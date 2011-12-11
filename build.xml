@@ -3,17 +3,25 @@
 <!--
 major props to http://www.tomjowitt.co.uk/2011/07/21/streamlined-php-development-part-iii/
 
-need todo on lampp
+only tested on lampp
+ TODO add full git & svn support
 
-if you have to use PEAR & channel-discover is borked: 
+Requires PEAR & Phing
+(found on lampp - setting PATH to pear location instead of php.ini include_path)
+
+if channel-discover for phing is borked: 
 
 pear upgrade –force Console_Getopt 
 pear upgrade –force pear 
 pear upgrade-all
 
+Also requires:
+
 pear install http_request2
 
 pear install VersionControl_Git or pear install "channel://pear.php.net/VersionControl_Git-0.4.4"
+
+if install borked:
 see: http://stackoverflow.com/questions/4483317/failed-opening-required-http-request2-php-include-path-c-php5-pear
 -->
 
@@ -166,8 +174,7 @@ see: http://stackoverflow.com/questions/4483317/failed-opening-required-http-req
 			
 	</target>
 	
-	<target name="updatewpconfig"
-		depends="install">
+	<target name="updatewpconfig">
 
 		<!-- append additional settings to wp-config.php file -->
 		<if>
@@ -291,7 +298,14 @@ see: http://stackoverflow.com/questions/4483317/failed-opening-required-http-req
 		<phingcall target="updatewpconfig" />
 		
 		<!-- install additional wp plugins -->
-		<phingcall target="installplugins" />
+		<if>
+			<isset property="build.download.plugin.urls"/>
+			<then>
+		
+				<phingcall target="installplugins" />
+				
+			</then>
+		</if>
 		
         <!-- think about permissions - every system is different - use conditional on builtin prop os.name -->
 <!--
@@ -316,9 +330,9 @@ see: http://stackoverflow.com/questions/4483317/failed-opening-required-http-req
         <echo msg="Build options" />
         <echo msg="------------------" />
         
-        <echo msg="$ phing install-wp-org.xml install - Download and install WordPress and Plugins" />
-		<echo msg="$ phing install-wp-org.xml pullgit - Pull/Update existing WordPress install from git" />
-        <echo msg="$ phing install-wp-org.xml help - Displays the available options" />
+        <echo msg="$ phing install - Download and install WordPress and Plugins" />
+		<!-- <echo msg="$ phing install-wp-org.xml pullgit - Pull/Update existing WordPress install from git" /> -->
+        <echo msg="$ phing install help - Displays the available options" />
         
     </target>
 
